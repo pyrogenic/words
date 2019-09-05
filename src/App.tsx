@@ -37,11 +37,39 @@ const SEARCH_ENGINE_ID = process.env.REACT_APP_SEARCH_ENGINE_ID;
        "thumbnailWidth": 150
       }
      },
-     */
+*/
 
-function PlayingCard(props: { word: string, asset: IAsset, onClick?: () => void }) {
-  const { word, asset, onClick } = props;
-  return (<Col className='p-1' xs={4} onClick={onClick}>
+function indexKey(word: string) {
+  return ['asset', word, 'index'].join('/');
+}
+
+function getIndex(word: string) {
+  return Number(localStorage.getItem(indexKey(word)) || '0');
+}
+function setIndex(word: string, index: number) {
+  localStorage.setItem(indexKey(word), index.toString())
+}
+
+async function fetchJson(urlString: string) {
+  const queryResult = await fetch(urlString);
+  console.log({ queryResult });
+  const result = await queryResult.json();
+  console.log({ result });
+  return result;
+}
+
+    
+function PlayingCard(props: { word: string, assets: IAsset[], index?: number }) {
+  const { word, assets } = props;
+  if (!word || !assets) {
+    throw new Error(`missing props: ${JSON.stringify(props)}`);
+  }
+  let index = getIndex(word);
+  if (index >= assets.length) {
+    index = 0;
+  }
+  const asset = assets[index];
+  return (<Col className='p-1' xs={4} key={word} onClick={() => setIndex(word, index++)}>
     <div className='playing-card'>
       <div className='img-box' style={{
         backgroundImage: `url(${asset.asset})`,
@@ -51,8 +79,8 @@ function PlayingCard(props: { word: string, asset: IAsset, onClick?: () => void 
     src={asset.asset}/> */}
       </div>
       <div className="word">
-        {word.split('').map((c) =>
-          <div className="letter">
+        {word.split('').map((c, i) =>
+          <div key={i} className="letter">
             {c}
           </div>
         )}
@@ -109,7 +137,7 @@ interface IState {
 
 class App extends React.Component<{}, IState> {
   private fetchMemo = new StorageMemo(localStorage, "fetchJson", fetchJson);
-  
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -121,8 +149,23 @@ class App extends React.Component<{}, IState> {
     };
   }
 
-  public render = () => (
-    <Container>
+  public render = () => {
+    const resultAssets: IAsset[] = [];
+    if (this.state.result) {
+      this.state.result.items.forEach((result) => {
+        if (result.image === undefined) {
+          return false;
+        }
+        const asset: IAsset = {
+          asset: result.image.thumbnailLink,
+          bleed: true,
+          license: "Google Image Search",
+          src: result.image.contextLink,
+        };
+        resultAssets.push(asset);
+      });
+    }
+    return <Container>
       <Card>
         <Card.Body>
           <Form onSubmitCapture={this.add}>
@@ -144,32 +187,22 @@ class App extends React.Component<{}, IState> {
           </Card.Body>}
         <Card.Body>
           <Row>
-            {this.state.cells.map((cell) => <PlayingCard {...cell} />)}
+            {this.state.cells.map((cell) => <PlayingCard
+              word={cell.word}
+              assets={[cell.asset]}
+              index={getIndex(cell.word)}
+            />)}
           </Row>
         </Card.Body>
         <Card.Body>
           <Row>
-            {this.state.result && this.state.result.items.map((result) => {
-              if (result.image === undefined) {
-                return false;
-              }
-              const asset: IAsset = {
-                asset: result.image.thumbnailLink,
-                bleed: true,
-                license: "Google Image Search",
-                src: result.image.contextLink,
-              };
-              return <PlayingCard asset={asset} word={this.state.q!} onClick={() => {
-                const cells = [...this.state.cells];
-                cells.push({ word: this.state.q!, asset });
-                this.setState({ cells });
-              }} />;
-            })}
+            {resultAssets.length > 0 && <PlayingCard assets={resultAssets} word={this.state.q!} index={getIndex(cell.word)}
+/>}
           </Row>
         </Card.Body>
       </Card>
-    </Container>
-  );
+    </Container>;
+  }
 
   private add = () => {
     const imgType: ImageType = "clipart";
@@ -204,11 +237,3 @@ type ImageType =
   "animated";
 
 export default App;
-async function fetchJson(urlString: string) {
-  const queryResult = await fetch(urlString);
-  console.log({ queryResult });
-  const result = await queryResult.json();
-  console.log({ result });
-  return result;
-}
-
