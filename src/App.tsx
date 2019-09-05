@@ -2,7 +2,6 @@ import * as React from 'react';
 import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
 
 import Container from 'react-bootstrap/Container';
 import ASSETS, { IAsset } from './assets'
@@ -196,7 +195,7 @@ class App extends React.Component<{}, IState> {
         </Card.Body>
         <Card.Body>
           <Row>
-            {resultAssets.length > 0 && <PlayingCard assets={resultAssets} word={this.state.q!} index={getIndex(cell.word)}
+            {resultAssets.length > 0 && <PlayingCard assets={resultAssets} word={this.state.q!} index={getIndex(this.state.q!)}
 />}
           </Row>
         </Card.Body>

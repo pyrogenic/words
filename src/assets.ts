@@ -5,7 +5,6 @@ export interface IAsset {
     bleed?: boolean,
 }
 
-
 const ASSETS: {[key: string]: IAsset} = {
     "bag": {
         license: "",
@@ -350,8 +349,8 @@ const ASSETS: {[key: string]: IAsset} = {
         asset: "images/"},
 };
 
-const IMAGE_WORDS: {[key: string]: string[] } = {    
-    bat: ['baseballBat']
-}
+// const IMAGE_WORDS: {[key: string]: string[] } = {    
+//     bat: ['baseballBat']
+// }
 
 export default ASSETS;
