@@ -1,0 +1,41 @@
+.playing-card {
+  width: 100%;
+  border: 1px solid lightgrey;
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.img-box {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background: white no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+  background-clip: padding-box;
+  border: 5.1px rgba(0, 0, 255, 0.06) solid;
+}
+
+.img-box img {
+  border-radius: 50%;
+  position: absolute;
+margin-top: auto;
+margin-bottom: auto;
+width: 100%;
+top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.word {
+  width: 100%;
+  display: flex;
+}
+
+.letter {
+  flex: 1;
+  text-align: center;
+  font-size: 4em
+}
